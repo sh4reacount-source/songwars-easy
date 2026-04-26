@@ -165,11 +165,8 @@ function setDownloadLinks(videoId) {
 }
 
 function getDownloadUrl(videoId) {
-    const origin = window.location.origin;
-    if (origin && origin.includes('localhost:3000')) {
-        return `/download?id=${encodeURIComponent(videoId)}`;
-    }
-    return `${LOCAL_SERVER_FALLBACK}/download?id=${encodeURIComponent(videoId)}`;
+    // Always use relative path so it works on any origin (localhost, Render, etc.)
+    return `/download?id=${encodeURIComponent(videoId)}`;
 }
 
 function downloadVideo() {
@@ -178,7 +175,7 @@ function downloadVideo() {
         return;
     }
 
-    statusText.textContent = 'Preparing download…';
+    statusText.textContent = 'Starting download…';
     downloadButton.disabled = true;
     
     const downloadUrl = getDownloadUrl(currentVideoId);
