@@ -1,8 +1,7 @@
 const express = require('express');
 const path = require('path');
 const yts = require('yt-search');
-const https = require('https');
-const http = require('http');
+const ytdl = require('ytdl-core');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,7 +41,6 @@ app.get('/search', async (req, res) => {
   }
 });
 
-// Proxy download to y2mate service
 app.get('/download', async (req, res) => {
   const videoId = (req.query.id || '').trim();
   if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
@@ -50,33 +48,34 @@ app.get('/download', async (req, res) => {
   }
 
   try {
-    // Use y2mate API for reliable downloading
-    const y2mateUrl = `https://www.y2mate.com/mates/en/youtube-downloader/download/${videoId}`;
+    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
     
-    const options = {
-      hostname: 'www.y2mate.com',
-      path: `/mates/en/youtube-downloader/download/${videoId}`,
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-      }
-    };
+    // Get video info for title
+    const info = await ytdl.getInfo(videoUrl);
+    const title = info.videoDetails.title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+    
+    res.setHeader('Content-Disposition', `attachment; filename="${title}.mp4"`);
+    res.setHeader('Content-Type', 'video/mp4');
 
-    https.get(options, (proxyRes) => {
-      // Pipe the response from y2mate directly to client
-      res.setHeader('Content-Type', proxyRes.headers['content-type'] || 'video/mp4');
-      res.setHeader('Content-Disposition', `attachment; filename="${videoId}.mp4"`);
-      proxyRes.pipe(res);
-    }).on('error', (error) => {
-      console.error('Download proxy error:', error);
-      res.status(500).json({ 
-        error: 'Download service error', 
-        fallback: `https://www.y2mate.com/en/download-youtube-video/${videoId}`
-      });
+    // Download video with best quality
+    const stream = ytdl(videoUrl, {
+      quality: 'highest',
+      filter: (format) => format.container === 'mp4'
     });
+
+    stream.on('error', (error) => {
+      console.error('Download error:', error.message);
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Download failed: ' + error.message });
+      } else {
+        res.destroy();
+      }
+    });
+
+    stream.pipe(res);
   } catch (error) {
-    console.error('Download error:', error);
-    res.status(500).json({ error: 'Download preparation failed' });
+    console.error('Download error:', error.message);
+    res.status(500).json({ error: 'Download failed: ' + error.message });
   }
 });
 
