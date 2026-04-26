@@ -6,10 +6,13 @@ const videoWrapper = document.getElementById('videoWrapper');
 const videoEmbed = document.getElementById('videoEmbed');
 const downloadButton = document.getElementById('downloadButton');
 const downloadLinks = document.getElementById('downloadLinks');
+const videoUrlSection = document.getElementById('videoUrlSection');
+const videoUrlLink = document.getElementById('videoUrlLink');
 
 let prompts = [];
 let currentPrompt = '';
 let currentVideoId = '';
+let currentVideoUrl = '';
 
 const DEFAULT_PROMPTS = [
     'Drake type beat free for profit',
@@ -79,24 +82,35 @@ function updatePromptDisplay(prompt) {
 function setCurrentVideo(video) {
     if (!video?.id) {
         currentVideoId = '';
+        currentVideoUrl = '';
         videoWrapper.classList.add('hidden');
+        videoUrlSection.style.display = 'none';
         videoStatus.textContent = 'No video available.';
         setDownloadLinks('');
         return;
     }
 
     currentVideoId = video.id;
+    currentVideoUrl = video.url;
     videoEmbed.src = `https://www.youtube.com/embed/${video.id}?autoplay=1&rel=0`;
     videoWrapper.classList.remove('hidden');
     videoStatus.textContent = video.title ? `Now playing: ${video.title}` : 'Now playing selected beat.';
     statusText.textContent = `Found video for beat: ${video.title || video.id}`;
+    
+    // Display the video URL
+    videoUrlLink.href = video.url;
+    videoUrlLink.textContent = video.url;
+    videoUrlSection.style.display = 'block';
+    
     setDownloadLinks(video.id);
 }
 
 function clearVideo() {
     currentVideoId = '';
+    currentVideoUrl = '';
     videoEmbed.src = '';
     videoWrapper.classList.add('hidden');
+    videoUrlSection.style.display = 'none';
     videoStatus.textContent = 'No video loaded yet.';
     setDownloadLinks('');
 }
@@ -149,6 +163,7 @@ async function searchLocalServer(query) {
             return {
                 id: data.id,
                 title: data.title || 'Random beat video',
+                url: data.url || `https://www.youtube.com/watch?v=${data.id}`,
                 thumbnail: data.thumbnail || ''
             };
         } catch (error) {
@@ -164,36 +179,16 @@ function setDownloadLinks(videoId) {
     downloadLinks.classList.add('hidden');
 }
 
-function getDownloadUrl(videoId) {
-    // Always use relative path so it works on any origin (localhost, Render, etc.)
-    return `/download?id=${encodeURIComponent(videoId)}`;
-}
-
 function downloadVideo() {
-    if (!currentVideoId) {
+    if (!currentVideoUrl) {
         statusText.textContent = 'No video loaded yet. Press Start first.';
         return;
     }
 
-    statusText.textContent = 'Starting download…';
-    downloadButton.disabled = true;
-    
-    const downloadUrl = getDownloadUrl(currentVideoId);
-    
-    // Create a hidden link and trigger download
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = `${currentVideoId}.mp4`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    downloadButton.disabled = false;
-    statusText.textContent = 'Download started!';
-    
-    setTimeout(() => {
-        statusText.textContent = `Found video for beat: ${currentPrompt}`;
-    }, 3000);
+    // Open y2mate downloader with the video URL
+    const y2mateUrl = `https://www.y2mate.com/en/download-youtube-video/${currentVideoId}`;
+    window.open(y2mateUrl, '_blank');
+    statusText.textContent = 'Opening download page...';
 }
 
 startButton.addEventListener('click', startRandomBeat);

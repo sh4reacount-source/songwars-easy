@@ -1,7 +1,6 @@
 const express = require('express');
 const path = require('path');
 const yts = require('yt-search');
-const ytdl = require('ytdl-core');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -38,45 +37,6 @@ app.get('/search', async (req, res) => {
   } catch (error) {
     console.error('Search error:', error);
     return res.status(500).json({ error: 'Search failed' });
-  }
-});
-
-app.get('/download', async (req, res) => {
-  const videoId = (req.query.id || '').trim();
-  if (!videoId || !/^[a-zA-Z0-9_-]{11}$/.test(videoId)) {
-    return res.status(400).send('Invalid video ID');
-  }
-
-  try {
-    const videoUrl = `https://www.youtube.com/watch?v=${videoId}`;
-    
-    // Get video info for title
-    const info = await ytdl.getInfo(videoUrl);
-    const title = info.videoDetails.title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-    
-    res.setHeader('Content-Disposition', `attachment; filename="${title}.mp3"`);
-    res.setHeader('Content-Type', 'audio/mpeg');
-
-    // Download audio only
-    const stream = ytdl(videoUrl, {
-      quality: 'highestaudio',
-      filter: 'audioonly'
-    });
-
-    stream.on('error', (error) => {
-      console.error('Download error:', error.message);
-      if (!res.headersSent) {
-        res.status(500).json({ error: 'Download failed: ' + error.message });
-      } else {
-        res.destroy();
-      }
-    });
-
-    // Pipe directly to response (audio stream is already MP3 compatible format)
-    stream.pipe(res);
-  } catch (error) {
-    console.error('Download error:', error.message);
-    res.status(500).json({ error: 'Download failed: ' + error.message });
   }
 });
 

@@ -37,11 +37,15 @@
                 <div class="video-wrapper hidden" id="videoWrapper">
                     <iframe id="videoEmbed" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                 </div>
+                <div class="video-url-section" id="videoUrlSection" style="display: none; margin: 15px 0; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+                    <p style="margin: 0 0 8px 0; font-size: 12px; color: #666;">Video URL:</p>
+                    <a id="videoUrlLink" href="#" target="_blank" style="word-break: break-all; color: #0066cc; text-decoration: none; font-size: 13px;"></a>
+                </div>
                 <div class="action-row">
-                    <button id="downloadButton">Download this beat</button>
+                    <button id="downloadButton">Download as MP3 (yt-dlp)</button>
                 </div>
                 <div id="downloadLinks" class="download-links hidden"></div>
-                <div class="note-text">The page downloads through the local node server. Open this app from http://localhost:3000 so search and download both work.</div>
+                <div class="note-text">Click the button above to open the video URL in a third-party downloader, or use the direct link to download.</div>
             </section>
 
             <section class="panel panel-status">
