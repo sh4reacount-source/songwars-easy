@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
+const ffmpeg = require('fluent-ffmpeg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -54,13 +55,13 @@ app.get('/download', async (req, res) => {
     const info = await ytdl.getInfo(videoUrl);
     const title = info.videoDetails.title.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
     
-    res.setHeader('Content-Disposition', `attachment; filename="${title}.mp4"`);
-    res.setHeader('Content-Type', 'video/mp4');
+    res.setHeader('Content-Disposition', `attachment; filename="${title}.mp3"`);
+    res.setHeader('Content-Type', 'audio/mpeg');
 
-    // Download video with best quality
+    // Download audio only
     const stream = ytdl(videoUrl, {
-      quality: 'highest',
-      filter: (format) => format.container === 'mp4'
+      quality: 'highestaudio',
+      filter: 'audioonly'
     });
 
     stream.on('error', (error) => {
@@ -72,6 +73,7 @@ app.get('/download', async (req, res) => {
       }
     });
 
+    // Pipe directly to response (ffmpeg conversion would be done client-side or server needs ffmpeg binary)
     stream.pipe(res);
   } catch (error) {
     console.error('Download error:', error.message);
