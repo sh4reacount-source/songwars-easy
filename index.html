@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SongWars Beat Finder</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-shell">
+        <header class="hero">
+            <div>
+                <h1>SongWars Beat Finder</h1>
+                <p>Use the artist list to create random beat searches, open YouTube, and launch a downloader.</p>
+            </div>
+            <div class="badge">Built for SongWars</div>
+        </header>
+
+        <main class="content">
+            <section class="panel">
+                <h2>1. Find a beat</h2>
+                <p>Press start and the site will pick a random beat prompt and find the first matching video.</p>
+                <div class="action-row">
+                    <button id="startButton">Start</button>
+                </div>
+                <div class="note-text">No typing needed. The app automatically selects the beat and loads the video preview.</div>
+            </section>
+
+            <section class="panel use-beat-panel">
+                <h2>Selected beat</h2>
+                <div class="selected-beat" id="beatPrompt">Waiting for start...</div>
+            </section>
+
+            <section class="panel video-panel">
+                <h2>Video preview</h2>
+                <div class="video-status" id="videoStatus">No video loaded yet.</div>
+                <div class="video-wrapper hidden" id="videoWrapper">
+                    <iframe id="videoEmbed" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+                <div class="action-row">
+                    <button id="downloadButton">Download this beat</button>
+                </div>
+                <div id="downloadLinks" class="download-links hidden"></div>
+                <div class="note-text">The page downloads through the local node server. Open this app from http://localhost:3000 so search and download both work.</div>
+            </section>
+
+            <section class="panel panel-status">
+                <h2>Status</h2>
+                <div id="statusText">Loading prompts from <code>artists.txt</code>…</div>
+            </section>
+
+            <section class="panel panel-history">
+                <h2>Prompt history</h2>
+                <ol id="historyList"></ol>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
