@@ -185,10 +185,15 @@ function downloadVideo() {
         return;
     }
 
-    // Open y2mate downloader with the video URL
-    const y2mateUrl = `https://www.y2mate.com/en/download-youtube-video/${currentVideoId}`;
-    window.open(y2mateUrl, '_blank');
-    statusText.textContent = 'Opening download page...';
+    // Copy URL to clipboard
+    navigator.clipboard.writeText(currentVideoUrl).then(() => {
+        statusText.textContent = 'Video URL copied to clipboard! Opening downloader...';
+    }).catch(() => {
+        statusText.textContent = 'Opening downloader...';
+    });
+
+    // Open ytmp3.nexus downloader
+    window.open('https://ytmp3.nexus/poMs/', '_blank');
 }
 
 startButton.addEventListener('click', startRandomBeat);
