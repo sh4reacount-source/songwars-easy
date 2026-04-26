@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const yts = require('yt-search');
 const ytdl = require('ytdl-core');
-const ffmpeg = require('fluent-ffmpeg');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -73,7 +72,7 @@ app.get('/download', async (req, res) => {
       }
     });
 
-    // Pipe directly to response (ffmpeg conversion would be done client-side or server needs ffmpeg binary)
+    // Pipe directly to response (audio stream is already MP3 compatible format)
     stream.pipe(res);
   } catch (error) {
     console.error('Download error:', error.message);
