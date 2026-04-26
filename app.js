@@ -179,7 +179,24 @@ function downloadVideo() {
     }
 
     statusText.textContent = 'Preparing download…';
-    window.location.href = getDownloadUrl(currentVideoId);
+    downloadButton.disabled = true;
+    
+    const downloadUrl = getDownloadUrl(currentVideoId);
+    
+    // Create a hidden link and trigger download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `${currentVideoId}.mp4`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    downloadButton.disabled = false;
+    statusText.textContent = 'Download started!';
+    
+    setTimeout(() => {
+        statusText.textContent = `Found video for beat: ${currentPrompt}`;
+    }, 3000);
 }
 
 startButton.addEventListener('click', startRandomBeat);
