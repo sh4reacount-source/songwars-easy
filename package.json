@@ -1,6 +1,10 @@
 {
   "name": "songwars-beat-finder",
   "version": "1.0.0",
+  "packageManager": "npm@10",
+  "engines": {
+    "node": ">=20.18.1"
+  },
   "description": "Local SongWars beat finder and downloader",
   "main": "server.js",
   "scripts": {
